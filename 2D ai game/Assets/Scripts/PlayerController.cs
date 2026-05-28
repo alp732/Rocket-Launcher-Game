@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -5,64 +6,87 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
-    public float moveSpeed = 6f;
+    public float moveSpeed = 7f;
     public float jumpForce = 12f;
 
     [Header("Ground Check")]
     public Transform groundCheck;
-    public float groundCheckRadius = 0.15f;
+    public float groundRadius = 0.2f;
     public LayerMask groundLayer;
 
     private Rigidbody2D rb;
-    private bool isGrounded;
-    private bool jumpRequested;
+    private bool jumpPressed;
+    private bool grounded;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+
+        rb.freezeRotation = true;
+        rb.gravityScale = 3f;
     }
 
     void Update()
     {
-        // Check grounded
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+        if (groundCheck != null)
+        {
+            grounded = Physics2D.OverlapCircle(
+                groundCheck.position,
+                groundRadius,
+                groundLayer
+            );
+        }
 
-        // Queue jump
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-            jumpRequested = true;
+        if (Input.GetKeyDown(KeyCode.Space) && grounded)
+        {
+            jumpPressed = true;
+        }
     }
 
     void FixedUpdate()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        rb.linearVelocity = new Vector2(horizontal * moveSpeed, rb.linearVelocity.y);
+        float move = Input.GetAxisRaw("Horizontal");
 
-        if (jumpRequested)
+        rb.linearVelocity = new Vector2(
+            move * moveSpeed,
+            rb.linearVelocity.y
+        );
+
+        if (jumpPressed)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-            jumpRequested = false;
+            rb.linearVelocity = new Vector2(
+                rb.linearVelocity.x,
+                jumpForce
+            );
+
+            jumpPressed = false;
         }
     }
 
-    /// <summary>
-    /// Apply an explosion force from a world position.
-    /// </summary>
-    public void ApplyExplosionForce(Vector2 explosionPos, float radius, float force)
+    public void ApplyExplosionForce(
+        Vector2 explosionPos,
+        float radius,
+        float force
+    )
     {
-        Vector2 dir = (Vector2)transform.position - explosionPos;
-        float distance = dir.magnitude;
+        Vector2 dir =
+            (Vector2)transform.position - explosionPos;
 
-        if (distance > radius) return;
+        float dist = dir.magnitude;
 
-        // Falloff: closer = more force
-        float falloff = 1f - Mathf.Clamp01(distance / radius);
-        Vector2 pushDir = dir.normalized;
+        if (dist > radius) return;
 
-        // Always push at least slightly upward so player gets air
-        pushDir.y = Mathf.Max(pushDir.y, 0.3f);
-        pushDir = pushDir.normalized;
+        float falloff =
+            1f - Mathf.Clamp01(dist / radius);
 
-        rb.AddForce(pushDir * force * falloff, ForceMode2D.Impulse);
+        Vector2 push = dir.normalized;
+
+        push.y = Mathf.Max(push.y, 0.35f);
+
+        rb.AddForce(
+            push.normalized * force * falloff,
+            ForceMode2D.Impulse
+        );
     }
 }
+

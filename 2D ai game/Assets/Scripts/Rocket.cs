@@ -1,68 +1,59 @@
+
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Rocket : MonoBehaviour
 {
-    [Header("Rocket Settings")]
-    public float speed = 14f;
-    public float explosionRadius = 2.5f;
-    public float explosionForce = 18f;
+    [Header("Rocket")]
+    public float speed = 15f;
+
+    [Header("Explosion")]
+    public float explosionRadius = 3f;
+    public float explosionForce = 20f;
+
+    [Header("Lifetime")]
     public float lifetime = 5f;
 
-    [Header("Effects")]
-    public GameObject explosionEffectPrefab;
-
     private Rigidbody2D rb;
-    private bool hasExploded = false;
+    private bool exploded;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        rb.gravityScale = 0f;
-        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
-        // Add trail automatically
-        if (GetComponent<RocketTrail>() == null)
-            gameObject.AddComponent<RocketTrail>();
+        rb.gravityScale = 0f;
+
+        rb.collisionDetectionMode =
+            CollisionDetectionMode2D.Continuous;
+
+        Destroy(gameObject, lifetime);
     }
 
     public void SetDirection(Vector2 dir)
     {
-        rb.linearVelocity = dir.normalized * speed;
-        Destroy(gameObject, lifetime);
+        rb.linearVelocity =
+            dir.normalized * speed;
     }
 
-    void OnCollisionEnter2D(Collision2D col)
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        // Don't self-explode on trigger zones
-        if (col.collider.isTrigger) return;
-        Explode();
-    }
+        if (exploded) return;
 
-    void Explode()
-    {
-        if (hasExploded) return;
-        hasExploded = true;
+        exploded = true;
 
-        // VFX
-        if (explosionEffectPrefab != null)
-            Instantiate(explosionEffectPrefab, transform.position, Quaternion.identity);
+        PlayerController player =
+            FindFirstObjectByType<PlayerController>();
 
-        // Screen shake
-        if (ScreenShake.Instance != null)
-            ScreenShake.Instance.Shake(0.22f, 0.18f);
-
-        // Push player
-        PlayerController player = FindFirstObjectByType<PlayerController>();
         if (player != null)
-            player.ApplyExplosionForce(transform.position, explosionRadius, explosionForce);
+        {
+            player.ApplyExplosionForce(
+                transform.position,
+                explosionRadius,
+                explosionForce
+            );
+        }
 
         Destroy(gameObject);
     }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = new Color(1f, 0.3f, 0f, 0.25f);
-        Gizmos.DrawWireSphere(transform.position, explosionRadius);
-    }
 }
+

@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 public class RocketLauncher : MonoBehaviour
@@ -6,61 +7,89 @@ public class RocketLauncher : MonoBehaviour
     public Transform player;
     public GameObject rocketPrefab;
 
-    [Header("Launcher Settings")]
-    public float orbitRadius = 0.9f;   // Distance from player center
-    public float fireRate = 0.4f;       // Seconds between shots
+    [Header("Settings")]
+    public float orbitRadius = 1f;
+    public float fireCooldown = 0.4f;
 
-    private float fireCooldown = 0f;
-    private Camera mainCam;
+    private float timer;
+    private Camera cam;
 
     void Start()
     {
-        mainCam = Camera.main;
+        cam = Camera.main;
+
+        if (player == null)
+        {
+            GameObject p = GameObject.Find("Player");
+
+            if (p != null)
+                player = p.transform;
+        }
     }
 
     void Update()
     {
-        AimAtMouse();
+        if (player == null) return;
 
-        fireCooldown -= Time.deltaTime;
+        Aim();
 
-        if (Input.GetMouseButtonDown(0) && fireCooldown <= 0f)
+        timer -= Time.deltaTime;
+
+        if (Input.GetMouseButtonDown(0) &&
+            timer <= 0f)
         {
-            Fire();
-            fireCooldown = fireRate;
+            Shoot();
+            timer = fireCooldown;
         }
     }
 
-    void AimAtMouse()
+    void Aim()
     {
-        if (player == null) return;
+        Vector3 mouse =
+            cam.ScreenToWorldPoint(
+                Input.mousePosition
+            );
 
-        // Get mouse in world space
-        Vector3 mouseWorld = mainCam.ScreenToWorldPoint(Input.mousePosition);
-        mouseWorld.z = 0f;
+        mouse.z = 0f;
 
-        // Direction from player to mouse
-        Vector2 dir = (mouseWorld - player.position).normalized;
+        Vector2 dir =
+            (mouse - player.position).normalized;
 
-        // Position launcher offset from player
-        transform.position = player.position + (Vector3)(dir * orbitRadius);
+        transform.position =
+            player.position +
+            (Vector3)(dir * orbitRadius);
 
-        // Rotate launcher to face mouse direction
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0f, 0f, angle);
+        float angle =
+            Mathf.Atan2(dir.y, dir.x) *
+            Mathf.Rad2Deg;
+
+        transform.rotation =
+            Quaternion.Euler(0, 0, angle);
     }
 
-    void Fire()
+    void Shoot()
     {
         if (rocketPrefab == null) return;
 
-        // Spawn rocket at launcher tip (forward tip = right direction since 0° = right)
-        Vector2 launchDir = transform.right;
-        Vector3 spawnPos = transform.position + (Vector3)(launchDir * 0.3f);
+        Vector2 dir = transform.right;
 
-        GameObject rocket = Instantiate(rocketPrefab, spawnPos, transform.rotation);
+        Vector3 spawnPos =
+            transform.position +
+            (Vector3)(dir * 0.6f);
+
+        GameObject rocket =
+            Instantiate(
+                rocketPrefab,
+                spawnPos,
+                transform.rotation
+            );
+
         Rocket r = rocket.GetComponent<Rocket>();
+
         if (r != null)
-            r.SetDirection(launchDir);
+        {
+            r.SetDirection(dir);
+        }
     }
 }
+
