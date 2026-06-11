@@ -4,13 +4,19 @@ public class CameraFollow : MonoBehaviour
 {
     public Transform target;
     public float smoothSpeed = 5f;
-    public Vector3 offset = new Vector3(0f, 2f, -10f);
+    public Vector3 offset = new Vector3(0, 2, -10);
 
     void LateUpdate()
     {
-        if (target == null) return;
+        if (target == null)
+            return;
 
-        Vector3 desired = target.position + offset;
-        transform.position = Vector3.Lerp(transform.position, desired, smoothSpeed * Time.deltaTime);
+        Vector3 desiredPosition = target.position + offset;
+
+        transform.position = Vector3.Lerp(
+            transform.position,
+            desiredPosition,
+            smoothSpeed * Time.deltaTime
+        );
     }
 }

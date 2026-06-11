@@ -81,7 +81,7 @@ public class PlayerController : MonoBehaviour
 
         Vector2 push = dir.normalized;
 
-        push.y = Mathf.Max(push.y, 0.35f);
+        push.y = Mathf.Max(push.y, 1f);
 
         rb.AddForce(
             push.normalized * force * falloff,

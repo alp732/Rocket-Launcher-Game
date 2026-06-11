@@ -9,7 +9,7 @@ public class Rocket : MonoBehaviour
 
     [Header("Explosion")]
     public float explosionRadius = 3f;
-    public float explosionForce = 20f;
+    public float explosionForce = 110f;
 
     [Header("Lifetime")]
     public float lifetime = 5f;

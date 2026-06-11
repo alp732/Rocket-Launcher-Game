@@ -8,8 +8,8 @@ public class RocketLauncher : MonoBehaviour
     public GameObject rocketPrefab;
 
     [Header("Settings")]
-    public float orbitRadius = 1f;
-    public float fireCooldown = 0.4f;
+    public float orbitRadius = 2f;
+    public float fireCooldown = 0.1f;
 
     private float timer;
     private Camera cam;
