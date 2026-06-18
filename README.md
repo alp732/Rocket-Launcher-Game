@@ -6,7 +6,7 @@ https://teams.microsoft.com/l/message/19:1b21149f-2ac8-4c6b-9b6a-bf830a5dd5ed_83
 
 https://chatgpt.com/share/6a18485e-04e8-83eb-956f-99119dd0fffa
 
-2D Ai Game Reflection
+
 2D AI Game Reflection
 •	During this project, I learned a lot about creating a 2D AI game in Unity. I think one thing I can improve on is my focus and time management while working on the project. Sometimes my mind is somewhere else, or I get so focused on building the game that I don’t notice what the teacher is explaining. In the future, I want to find a better balance between focusing on my project and still paying attention to feedback and instructions.
 Two things I needed to improve on the most were:
